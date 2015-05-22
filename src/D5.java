@@ -59,5 +59,34 @@ public class D5 extends Vertex{
 		protN7=n7-n7UnprotVertices.size();
 		thtValue=(n7-protN7)-fireDist-1;
 	}
+	
+	/**
+	 * An accessor for fireDist
+	 * @return - the distance from this vertex to the fire
+	 */
+	public int getFireDistance(){
+		return fireDist;
+	}
+	
+	/**
+	 * A mutator for fireDist
+	 */
+	public void setFireDistance(int dist){
+		fireDist=dist;
+	}
 
+	/**
+	 * An accessor for timeChanged
+	 * @return - the last time at which this vertex's threat value was increased
+	 */
+	public int getTimeChanged(){
+		return timeChanged;
+	}
+	
+	/**
+	 * A mutator for timeChanged
+	 */
+	public void setTimeChanged(int time){
+		timeChanged=time;
+	}
 }
