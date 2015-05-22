@@ -2,9 +2,9 @@ import java.util.ArrayList;
 
 
 public class D7 extends Vertex{
-	public int maxAffected;
-	public int allAffected;
-	public int recentAffected;
+	private int maxAffected; //number of vertices in n5 (D5 vertices that are two steps away from this vertex) that have the current maximum threat value
+	private int allAffected; //number of D5 vertices in n5 that have 
+	private int recentAffected; //number of D5 vertices in n5 whose threat values have increased in the last time step
 	public ArrayList<Coordinate> n5 = new ArrayList<Coordinate>();
 	
 	D7(int x, int y){

@@ -1,3 +1,8 @@
+/**
+ * A simple coordinate class
+ * @author Corinne Madsen
+ * @date 5/21/15
+ */
 
 public class Coordinate {
 	private int x;
