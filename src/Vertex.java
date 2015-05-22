@@ -1,16 +1,49 @@
 
 public class Vertex {
-	public Coordinate c;
-	public boolean burned =false;
-	public boolean protect=false;
-	public boolean burnedFrom = false;
-	public int timeBurned = -1;
-	public Coordinate burnOrigin=null;
+	private Coordinate c; //the coordinate of this vertex
+	private boolean burned =false; //whether or not this vertex has been burned
+	private boolean protect=false; //whether or not this vertex has been protected
+	private boolean burnedFrom = false; //if this vertex is burned, whether or not it has been burned from
+	private int timeBurned = -1; //when this vertex was burned (-1 if it has not yet been burned)
+	private Coordinate burnOrigin=null; //if this vertex was burned, where it was burned from (otherwise null)
 
+	/**
+	 * A simple constructor for a vertex
+	 * @param x
+	 * @param y
+	 */
 	Vertex(int x, int y){
 		c=new Coordinate(x,y);
 	}
+	
+	/**
+	 * An accessor for burned
+	 * @return - true if this vertex has been burned, false if not
+	 */
+	public boolean isBurned(){
+		return burned;
+	}
+	
+	/**
+	 * An accessor for protected
+	 * @return - true if this vertex has been protected, false if not
+	 */
+	public boolean isProtected(){
+		return protect;
+	}
+	
+	/**
+	 * An accessor for c, the Coordinate of the vertex
+	 * @return - the Coordinate of this vertex
+	 */
+	public Coordinate getCoordinate(){
+		return c;
+	}
 
+	/**
+	 * A method that burns from this vertex. It attempts to burn any unburned vertex that is one step away
+	 * and then removes this vertex from the list of vertices that can be burned.
+	 */
 	public void burnFrom(){
 		if(up()!=null)
 			up().burn(this);
@@ -24,15 +57,20 @@ public class Vertex {
 		
 	}
 
+	/**
+	 * A method to burn a vertex v from while burning from this vertex
+	 * @param v - the vertex that is being burned from this one
+	 * @return - true if the vertex was successfully burned and false if it was already protected or burned
+	 */
 	public boolean burn(Vertex v){
-		if(!protect && !burned){
-			burned=true;
-			timeBurned=Firefighter.time;
-			Firefighter.burnableVertices.add(c);
-			Firefighter.justBurned.add(c);
-			burnOrigin=v.c;
+		if(!v.isProtected() && !v.isBurned()){
+			v.burned=true;
+			v.timeBurned=Firefighter.time;
+			Firefighter.burnableVertices.add(v.getCoordinate());
+			Firefighter.justBurned.add(v.getCoordinate());
+			burnOrigin=c;
 			updateFireDistance();
-			if(Math.abs(v.c.x)+Math.abs(v.c.y)==7){
+			if(Math.abs(v.c.getX())+Math.abs(v.c.getY())==7){
 				Firefighter.reachedD7=true;
 				Firefighter.d7Unprotected.remove(v.c);
 			}

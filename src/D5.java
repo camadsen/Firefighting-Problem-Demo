@@ -51,7 +51,7 @@ public class D5 extends Vertex{
 			for(int i =n7UnprotVertices.size()-1; i>=0; i--){
 				Coordinate c = n7UnprotVertices.get(i);
 				D7 vert=(D7) Firefighter.grid[c.getX()+9][c.getY()+9];
-				if(vert.protect){
+				if(vert.isProtected()){
 					n7UnprotVertices.remove(c);
 				}
 			}

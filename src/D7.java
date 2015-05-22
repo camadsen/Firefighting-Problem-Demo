@@ -1,12 +1,26 @@
+/**
+ * A class for coordinates in D7 (coordinates that are of distance 7 away from the origin). More information is
+ * stored for these coordinates as they are the vertices which are protected in my proof's strategy for 
+ * containing the fire.
+ * 
+ * @author Corinne Madsen
+ * @date 5/21/15
+ *
+ */
 import java.util.ArrayList;
 
 
 public class D7 extends Vertex{
 	private int maxAffected; //number of vertices in n5 (D5 vertices that are two steps away from this vertex) that have the current maximum threat value
-	private int allAffected; //number of D5 vertices in n5 that have 
+	private int allAffected; //the total number of D5 vertices in n5
 	private int recentAffected; //number of D5 vertices in n5 whose threat values have increased in the last time step
-	public ArrayList<Coordinate> n5 = new ArrayList<Coordinate>();
+	public ArrayList<Coordinate> n5 = new ArrayList<Coordinate>(); //an Arraylist of vertices in D5 (distance 5 from the origin) that are two steps away from this vertex
 	
+	/**
+	 * Constructor for a D7 vertex
+	 * @param x - the x value of the coordinate
+	 * @param y - the y value of the coordinate
+	 */
 	D7(int x, int y){
 		super(x,y);
 		maxAffected=0;
