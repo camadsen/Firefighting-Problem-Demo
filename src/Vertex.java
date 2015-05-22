@@ -1,3 +1,12 @@
+/**
+ * A class for full Vertices that stores their coordinate and information about them including whether or not
+ * they have been burned, protected, and burned from. This class also contains methods allowing vertices to be
+ * burned or burned from and to recursively update the distance from the fire.
+ * 
+ * @author Corinne Madsen
+ * @date 5/21/15
+ *
+ */
 
 public class Vertex {
 	private Coordinate c; //the coordinate of this vertex
@@ -49,7 +58,7 @@ public class Vertex {
 		burn(down());
 		burn(left());
 		burn(right());
-		Firefighter.burnableVertices.remove(c);
+		FirefighterModel.getBurnableVertices().remove(c);
 
 	}
 
@@ -61,14 +70,14 @@ public class Vertex {
 	public boolean burn(Vertex v){
 		if(!v.isProtected() && !v.isBurned()){
 			v.burned=true;
-			v.timeBurned=Firefighter.time;
-			Firefighter.burnableVertices.add(v.getCoordinate());
-			Firefighter.justBurned.add(v.getCoordinate());
+			v.timeBurned=FirefighterModel.getTime();
+			FirefighterModel.getBurnableVertices().add(v.getCoordinate());
+			FirefighterModel.getJustBurned().add(v.getCoordinate());
 			burnOrigin=c;
 			updateFireDistance();
 			if(Math.abs(v.c.getX())+Math.abs(v.c.getY())==7){
-				Firefighter.reachedD7=true;
-				Firefighter.d7Unprotected.remove(v.c);
+				FirefighterModel.reachedD7();
+				FirefighterModel.getD7Unprotected().remove(v.c);
 			}
 			return true;
 		}
@@ -101,7 +110,7 @@ public class Vertex {
 			D5 current = (D5) this;
 			if(current.getFireDistance()>distance){
 				current.setFireDistance(distance);
-				current.setTimeChanged(Firefighter.time);
+				current.setTimeChanged(FirefighterModel.getTime());
 			}
 		}
 	}
@@ -158,7 +167,7 @@ public class Vertex {
 	 */
 	public Vertex up(){
 		if(c.getY()+1<=9)
-			return Firefighter.grid[9+c.getX()][9+c.getY()+1];
+			return FirefighterModel.getGrid()[9+c.getX()][9+c.getY()+1];
 		else
 			return null;
 	}
@@ -169,7 +178,7 @@ public class Vertex {
 	 */
 	public Vertex down(){
 		if(c.getY()-1>=-9)
-			return Firefighter.grid[9+c.getX()][9+c.getY()-1];
+			return FirefighterModel.getGrid()[9+c.getX()][9+c.getY()-1];
 		else
 			return null;
 	}
@@ -180,7 +189,7 @@ public class Vertex {
 	 */
 	public Vertex left(){
 		if(c.getX()-1>=-9)
-			return Firefighter.grid[9+c.getX()-1][9+c.getY()];
+			return FirefighterModel.getGrid()[9+c.getX()-1][9+c.getY()];
 		else
 			return null;
 	}
@@ -191,7 +200,7 @@ public class Vertex {
 	 */
 	public Vertex right(){
 		if(c.getX()+1<=9)
-			return Firefighter.grid[9+c.getX()+1][9+c.getY()];
+			return FirefighterModel.getGrid()[9+c.getX()+1][9+c.getY()];
 		else
 			return null;
 	}
@@ -203,7 +212,7 @@ public class Vertex {
 	 * @return - the Vertex with that coordinate value
 	 */
 	public static Vertex getVertex(Coordinate c1){
-		return Firefighter.grid[c1.getX()+9][c1.getY()+9];
+		return FirefighterModel.getGrid()[c1.getX()+9][c1.getY()+9];
 	}
 
 }

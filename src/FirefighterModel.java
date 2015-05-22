@@ -1,24 +1,58 @@
 import java.util.ArrayList;
 
 
-public class Firefighter {
-	public static boolean burnTurn=false;
-	public static boolean reachedD7=false;
-	public static int time;
-	public static int maxThtVal;
-	public static Vertex[][] grid= new Vertex[19][19];
-	public static ArrayList<Coordinate> burnableVertices= new ArrayList<Coordinate>();
-	public static ArrayList<Coordinate> justBurned = new ArrayList<Coordinate>();
-	public static ArrayList<D7> d7Unprotected = new ArrayList<D7>();
-	public static ArrayList<D5> d5Vertices = new ArrayList<D5>();
+public class FirefighterModel {
+	private static boolean burnTurn=false; //whether or not it is the turn of the fire
+	private static boolean reachedD7=false; //whether or not the fire has reached D7 (a distance of 7 from the origin)
+	private static int time; //the current time step of the simulation
+	private static int maxThtVal; //the maximum threat value of any D5 vertex
+	private static Vertex[][] grid= new Vertex[19][19]; //the array of all vertices on the grid that are displayed in the simulation
+	private static ArrayList<Coordinate> burnableVertices= new ArrayList<Coordinate>(); // the list of all vertices that can be burned
+	private static ArrayList<Coordinate> justBurned = new ArrayList<Coordinate>(); //the list of all vertices that were burned during the previous time step
+	private static ArrayList<D7> d7Unprotected = new ArrayList<D7>(); //the list of all vertices on D7 that haven't been protected yet; used by the algorithm to determine where to protect next
+	private static ArrayList<D5> d5Vertices = new ArrayList<D5>(); //the list of all vertices on D5
 
 
-	Firefighter(){
+	/**
+	 * A constructor for a model of the Firefighting (1-pyro) problem
+	 */
+	FirefighterModel(){
 		time=0;
 		maxThtVal=-1;
 		setUpGrid();
 	}
+	
+	/**
+	 * An accessor for grid
+	 * @return - the grid of vertices
+	 */
+	public static Vertex[][] getGrid(){
+		return grid;
+	}
+	
+	/**
+	 * An accessor for burnableVertices
+	 * @return - the list of 
+	 */
+	public static ArrayList<Coordinate> getBurnableVertices(){
+		return burnableVertices;
+	}
+	
+	public static int getTime(){
+		return time;
+	}
 
+	public static ArrayList<Coordinate> getJustBurned(){
+		return justBurned;
+	}
+	
+	public static ArrayList<D7> getD7Unprotected(){
+		return d7Unprotected;
+	}
+	
+	public static void reachedD7(){
+		reachedD7=true;
+	}
 
 	public static void setUpGrid(){
 		for(int i=0; i<19; i++){
