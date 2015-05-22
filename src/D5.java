@@ -50,7 +50,7 @@ public class D5 extends Vertex{
 		if(n7UnprotVertices.size()>0){
 			for(int i =n7UnprotVertices.size()-1; i>=0; i--){
 				Coordinate c = n7UnprotVertices.get(i);
-				D7 vert=(D7) Firefighter.grid[c.getX()+9][c.getY()+9];
+				D7 vert=(D7) FirefighterModel.getGrid()[c.getX()+9][c.getY()+9];
 				if(vert.isProtected()){
 					n7UnprotVertices.remove(c);
 				}
@@ -88,5 +88,13 @@ public class D5 extends Vertex{
 	 */
 	public void setTimeChanged(int time){
 		timeChanged=time;
+	}
+	
+	/**
+	 * An accessor for thtValue
+	 * @return - the threat value of the vertex
+	 */
+	public int getThreatValue(){
+		return thtValue;
 	}
 }
