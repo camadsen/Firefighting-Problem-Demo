@@ -37,6 +37,45 @@ public class D7 extends Vertex{
 		allAffected=n5.size();
 	}
 	
+	/**
+	 * An accessor for maxAffected
+	 * @return the total number of D5 vertices 2 steps away that have the current max threat value
+	 */
+	public int getMaxAffected(){
+		return maxAffected;
+	}
+	
+	/**
+	 * A mutator for maxAffected
+	 * 
+	 */
+	public void setMaxAffected(int maxAffected){
+		this.maxAffected=maxAffected;
+	}
+	
+	/**
+	 * An accessor for allAffected
+	 * @return the total number of D5 vertices 2 steps away
+	 */
+	public int getAllAffected(){
+		return allAffected;
+	}
+	
+	/**
+	 * An accessor for recentAffected
+	 * @return the total number of D5 vertices 2 steps away whose threat values increased in the last time step
+	 */
+	public int getRecentAffected(){
+		return recentAffected;
+	}
+	
+	/**
+	 * A mutator for recentAffected
+	 * 
+	 */
+	public void setRecentAffected(int recentAffected){
+		this.recentAffected= recentAffected;
+	}
 	
 	
 }

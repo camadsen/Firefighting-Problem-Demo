@@ -204,6 +204,14 @@ public class Vertex {
 		else
 			return null;
 	}
+	
+	/**
+	 * An accessor for burnOrigin
+	 * @return which coordinate this vertex was burned from (which is null if this coordinate is not yet burnt)
+	 */
+	public Coordinate getBurnOrigin(){
+		return burnOrigin;
+	}
 
 
 	/**
@@ -214,5 +222,6 @@ public class Vertex {
 	public static Vertex getVertex(Coordinate c1){
 		return FirefighterModel.getGrid()[c1.getX()+9][c1.getY()+9];
 	}
+	
 
 }

@@ -13,7 +13,6 @@ import javax.swing.*;
 
 public class FireGUI extends JFrame {
 	private static final long serialVersionUID = 1L;
-	private static Random gen = new Random();
 	private Container cPane;
 	private static Image graph;
 	private static int side=600;
@@ -21,7 +20,7 @@ public class FireGUI extends JFrame {
 	private static int radius =side/100;
 	private static JLabel label = new JLabel(" ");
 	private static JPanel info= new JPanel();
-	private static JLabel timeCounter = new JLabel("Time: "+Firefighter.time);
+	private static JLabel timeCounter = new JLabel("Time: "+FirefighterModel.getTime());
 	private static JLabel turnCounter = new JLabel("Firefighter's Turn",javax.swing.SwingConstants.RIGHT);
 	private static int fireMode=0; //0=User choice, 1=random choice
 	private static int firefighterMode=0; //0=User choice, 1=Random D7 protection, 2=Algorithm D7 protection
@@ -51,7 +50,7 @@ public class FireGUI extends JFrame {
 		cPane.add(gridDisplay);
 		pack();
 		setVisible(true);
-		new Firefighter();
+		new FirefighterModel();
 		this.addComponentListener(new ComponentListener(){
 
 			@Override
@@ -137,7 +136,7 @@ public class FireGUI extends JFrame {
 
 	public static void setCounters(){
 		String s="'s Turn";
-		if(Firefighter.burnTurn){
+		if(FirefighterModel.burnTurn){
 			s="Fire".concat(s);
 			turnCounter.setForeground(Color.RED);
 		}
@@ -147,7 +146,7 @@ public class FireGUI extends JFrame {
 
 		}
 		turnCounter.setText(s);
-		timeCounter.setText("Time: "+Firefighter.time);
+		timeCounter.setText("Time: "+FirefighterModel.getTime());
 	}
 
 	static class ButtonListener implements ActionListener{
@@ -163,18 +162,18 @@ public class FireGUI extends JFrame {
 			if(buttonType==0){
 				fireMode=option;
 				if(option==1 && Firefighter.burnTurn){
-					randomBurn();
+					FirefighterModel.randomBurn();
 					graph.repaint();
 				}
 			}
 			else{
 				firefighterMode=option;
-				if(option==1 && !Firefighter.burnTurn){
-					randomD7Protect();
+				if(option==1 && !FirefighterModel.burnTurn){
+					FirefighterModel.randomD7Protect();
 					graph.repaint();
 				}
-				if(option==2 && !Firefighter.burnTurn){
-					algorithmicD7Protect();
+				if(option==2 && !FirefighterModel.burnTurn){
+					FirefighterModel.algorithmicD7Protect();
 					graph.repaint();
 				}
 			}
@@ -192,8 +191,8 @@ public class FireGUI extends JFrame {
 		fireMode=0;
 		firefighterMode=0;
 		firef1.setSelected(true);
-		new Firefighter();
-		Firefighter.burnTurn=false;
+		new FirefighterModel();
+		FirefighterModel.burnTurn=false;
 		setCounters();
 		graph.repaint();
 	}
@@ -209,14 +208,14 @@ public class FireGUI extends JFrame {
 		Vertex v = Vertex.getVertex(c);
 		if(Firefighter.burnTurn){
 			//burn from
-			if(Firefighter.burnFrom(v)){
-				Firefighter.burnTurn=false;
+			if(FirefighterModel.burnFrom(v)){
+				FirefighterModel.burnTurn=false;
 				label.setText(" ");
 				if(firefighterMode==1){
-					randomD7Protect();
+					FirefighterModel.randomD7Protect();
 				}
 				if(firefighterMode==2){
-					algorithmicD7Protect();
+					FirefighterModel.algorithmicD7Protect();
 				}
 			}
 			else{
@@ -225,11 +224,11 @@ public class FireGUI extends JFrame {
 		}
 		else{
 			//protect at
-			if(Firefighter.protect(v)){
-				Firefighter.burnTurn=true;
+			if(FirefighterModel.protect(v)){
+				FirefighterModel.burnTurn=true;
 				label.setText(" ");
 				if(fireMode==1){
-					randomBurn();
+					FirefighterModel.randomBurn();
 				}
 			}
 			else{
@@ -240,37 +239,7 @@ public class FireGUI extends JFrame {
 
 	}
 
-	public static void randomBurn(){
-		Coordinate c = Firefighter.burnableVertices.get(gen.nextInt(Firefighter.burnableVertices.size()));
-		Vertex v = Vertex.getVertex(c);
-		if(!Firefighter.burnFrom(v)){
-			randomBurn();
-		}
-		else{
-			Firefighter.burnTurn=false;
-		}
-	}
 
-	public static void randomD7Protect(){
-		Vertex v = Firefighter.d7Unprotected.get(gen.nextInt(Firefighter.d7Unprotected.size()));
-		if(!Firefighter.protect(v)){
-			randomD7Protect();
-		}
-		else{
-			Firefighter.burnTurn=true;
-		}
-	}
-
-	public static void algorithmicD7Protect(){
-		Vertex v=Firefighter.algorithmicD7Choice();
-		Firefighter.protect(v);
-		if(Firefighter.d7Unprotected.size()==0){
-			JOptionPane.showMessageDialog(null,  "All D7 vertices have been protected and the fire has been contained. The board will now reset.", 
-					"Fire Contained", JOptionPane.INFORMATION_MESSAGE);
-			reset();
-		}
-		Firefighter.burnTurn=true;
-	}
 	
 	public class Image extends JPanel {
 		private static final long serialVersionUID = 1L;
@@ -319,19 +288,20 @@ public class FireGUI extends JFrame {
 			g2.drawPolygon(diamond7);
 
 			//Drawing the burned/protected vertices
-			for(int i=0; i<Firefighter.grid.length; i++){
-				for(int j=0; j<Firefighter.grid[i].length; j++){
-					if(Firefighter.grid[i][j].burned){
+			Vertex[][] grid=FirefighterModel.getGrid();
+			for(int i=0; i<grid.length; i++){
+				for(int j=0; j<grid[i].length; j++){
+					if(grid[i][j].isBurned()){
 						g2.setColor(Color.RED);
 						g2.fillOval(gap+i*gap-radius, gap+j*gap-radius, radius*2, radius*2);
 						//encircling the recently burned vertices
-						if(Firefighter.justBurned.contains(Firefighter.grid[i][j].c)){
+						if(FirefighterModel.getJustBurned().contains(grid[i][j].getCoordinate())){
 							g2.drawOval(gap+i*gap-radius*3/2, gap+j*gap-radius*3/2, (radius*3/2)*2, (radius*3/2)*2);
 						}
-						g2.drawLine(gap+i*gap, gap+j*gap, gap+(Firefighter.grid[i][j].burnOrigin.x+9)*gap, gap+(Firefighter.grid[i][j].burnOrigin.y+9)*gap);
+						g2.drawLine(gap+i*gap, gap+j*gap, gap+(grid[i][j].getBurnOrigin().getX()+9)*gap, gap+(grid[i][j].getBurnOrigin().getY()+9)*gap);
 
 					}
-					else if(Firefighter.grid[i][j].protect){
+					else if(grid[i][j].isProtected()){
 						g2.setColor(Color.BLUE);
 						g2.setStroke(new BasicStroke(2));
 						g2.drawOval(gap+i*gap-radius, gap+j*gap-radius, radius*2, radius*2);
@@ -350,7 +320,7 @@ public class FireGUI extends JFrame {
 	public static void main(String[] args) {
 		new FireGUI();
 		while(true){
-			if(Firefighter.burnableVertices.isEmpty()){
+			if(FirefighterModel.getBurnableVertices().isEmpty()){
 				JOptionPane.showMessageDialog(null,  "The fire can no longer expand. The graph will be reset.", 
 						"Fire Contained", JOptionPane.INFORMATION_MESSAGE);
 				reset();

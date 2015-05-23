@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Random;
+
 
 
 public class FirefighterModel {
@@ -11,6 +13,7 @@ public class FirefighterModel {
 	private static ArrayList<Coordinate> justBurned = new ArrayList<Coordinate>(); //the list of all vertices that were burned during the previous time step
 	private static ArrayList<D7> d7Unprotected = new ArrayList<D7>(); //the list of all vertices on D7 that haven't been protected yet; used by the algorithm to determine where to protect next
 	private static ArrayList<D5> d5Vertices = new ArrayList<D5>(); //the list of all vertices on D5
+	private static Random gen = new Random();
 
 
 	/**
@@ -60,6 +63,14 @@ public class FirefighterModel {
 	 */
 	public static ArrayList<D7> getD7Unprotected(){
 		return d7Unprotected;
+	}
+	
+	/**
+	 * An accessor for burnTurn
+	 * @return true if it is the fire's turn and false if it is the firefighter's turn
+	 */
+	public boolean isBurnTurn(){
+		return burnTurn;
 	}
 	
 	/**
@@ -129,7 +140,12 @@ public class FirefighterModel {
 		}
 	}
 
-	//CURRENTLY MAKING CHANGES FROM HERE FORWARD
+	/**
+	 * A method to choose which vertex on D7 should be protected next following the algorithm
+	 * outlined in my proof to contain the fire.
+	 * 
+	 * @return the D7 vertex to protect next
+	 */
 	public static D7 algorithmicD7Choice(){
 		//updating D5 threat values
 		int max=-5;
@@ -147,78 +163,122 @@ public class FirefighterModel {
 			if(d.getThreatValue()==maxThtVal){
 				maxD5.add(d);
 			}
-			if(d.timeChanged==time){
+			if(d.getTimeChanged()==time){
 				justChanged.add(d);
 			}
 		}
-		ArrayList<D7> algorithmChoices=new ArrayList<D7>();
+		ArrayList<D7> maxAlgorithmChoices=new ArrayList<D7>();
 		int maxMax=0;
 		for(D7 v: d7Unprotected){
-			v.maxAffected=0;
-			v.recentAffected=0;
+			v.setMaxAffected(0);
+			v.setRecentAffected(0);
 			for(Coordinate c:v.n5){
 				D5 vert5=(D5)Vertex.getVertex(c);
 				if(maxD5.contains(vert5)){
-					v.maxAffected++;
+					v.setMaxAffected(v.getMaxAffected()+1);
 				}
 				if(justChanged.contains(vert5)){
-					v.recentAffected++;
+					v.setRecentAffected(v.getRecentAffected()+1);
 				}
 			}
-			if(v.maxAffected>=maxMax){
-				if(v.maxAffected>maxMax){
-					algorithmChoices.clear();
+			if(v.getMaxAffected()>=maxMax){
+				if(v.getMaxAffected()>maxMax){
+					maxAlgorithmChoices.clear();
+					maxMax=v.getMaxAffected();
 				}
-				algorithmChoices.add(v);
-				maxMax=v.maxAffected;
+				maxAlgorithmChoices.add(v);
 			}
 		}
-		for(Vertex v:algorithmChoices){
-			System.out.print(v.c);
+		for(Vertex v:maxAlgorithmChoices){
+			System.out.print(v.getCoordinate());
 		}
-		//algorithmChoices now holds all D7 vertices that will affect a maximum number of
+		//maxAlgorithmChoices now holds all D7 vertices that will affect a maximum number of 
 		//D5 vertices that currently have the maximum threat value
-		if(algorithmChoices.size()>1){
+		if(maxAlgorithmChoices.size()>1){
 			//next want to limit to those that will affect a maximum number of total D5 vertices
 			int maxAll=0;
-			ArrayList<D7> algorithmChoices2=new ArrayList<D7>();
-			for(D7 d: algorithmChoices){
-				if(d.allAffected>=maxAll){
-					if(d.allAffected>maxAll){
-						maxAll=d.allAffected;
-						algorithmChoices2.clear();
+			ArrayList<D7> allAlgorithmChoices=new ArrayList<D7>();
+			for(D7 d: maxAlgorithmChoices){
+				if(d.getAllAffected()>=maxAll){
+					if(d.getAllAffected()>maxAll){
+						maxAll=d.getAllAffected();
+						allAlgorithmChoices.clear();
 					}
-					algorithmChoices2.add(d);
+					allAlgorithmChoices.add(d);
 				}
 			}
 			System.out.println();
-			for(Vertex v:algorithmChoices2){
-				System.out.print(v.c);
+			for(Vertex v:allAlgorithmChoices){
+				System.out.print(v.getCoordinate());
 			}
-			if(algorithmChoices2.size()>1){
+			if(allAlgorithmChoices.size()>1){
 				int maxRecent=0;
-				ArrayList<D7> algorithmChoices3=new ArrayList<D7>();
-				for(D7 d: algorithmChoices2){
-					if(d.recentAffected>=maxRecent){
-						if(d.recentAffected>maxRecent){
-							maxRecent=d.recentAffected;
-							algorithmChoices3.clear();
+				ArrayList<D7> recentAlgorithmChoices=new ArrayList<D7>();
+				for(D7 d: allAlgorithmChoices){
+					if(d.getRecentAffected()>=maxRecent){
+						if(d.getRecentAffected()>maxRecent){
+							maxRecent=d.getRecentAffected();
+							recentAlgorithmChoices.clear();
 						}
-						algorithmChoices3.add(d);
+						recentAlgorithmChoices.add(d);
 					}
 				}
 				System.out.println();
-				for(Vertex v:algorithmChoices3){
-					System.out.print(v.c);
+				for(Vertex v:recentAlgorithmChoices){
+					System.out.print(v.getCoordinate());
 				}
-				return algorithmChoices3.get(0);
+				return recentAlgorithmChoices.get(0);
 			}
 			else{
-				return algorithmChoices2.get(0);
+				return allAlgorithmChoices.get(0);
 			}
 		}
 
-		return algorithmChoices.get(0);
+		return maxAlgorithmChoices.get(0);
+	}
+	
+	/**
+	 * A method to choose randomly where the fire should burn from
+	 */
+	public static void randomBurn(){
+		Coordinate c = burnableVertices.get(gen.nextInt(burnableVertices.size()));
+		Vertex v = Vertex.getVertex(c);
+		if(!burnFrom(v)){
+			randomBurn();
+		}
+		else{
+			burnTurn=false;
+		}
+	}
+
+	/**
+	 * A method to choose randomly which D7 vertex should next be protected
+	 */
+	public static void randomD7Protect(){
+		Vertex v = d7Unprotected.get(gen.nextInt(d7Unprotected.size()));
+		if(!protect(v)){
+			randomD7Protect();
+			if(d7Unprotected.size()==0){
+				
+			}
+		}
+		else{
+			burnTurn=true;
+		}
+	}
+
+	/**
+	 * A method that uses protects the choice chosen by the algorithm and tests if the fire has been contained
+	 */
+	public static void algorithmicD7Protect(){
+		Vertex v=algorithmicD7Choice();
+		protect(v);
+		if(d7Unprotected.size()==0){
+			JOptionPane.showMessageDialog(null,  "All D7 vertices have been protected and the fire has been contained. The board will now reset.", 
+					"Fire Contained", JOptionPane.INFORMATION_MESSAGE);
+			reset();
+		}
+		burnTurn=true;
 	}
 
 }
