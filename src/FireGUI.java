@@ -40,11 +40,10 @@ public class FireGUI extends JFrame {
 	 * This constructor creates the GUI for the Firefighting problem simulation.
 	 */
 	public FireGUI(){
-		super("Firefighting Demonstration");
+		super("Firefighting Problem Simulation");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setPreferredSize(new Dimension(900,700));
 		setLocation(200, 30);
-		setIconImage(new ImageIcon("Firefighter (2).jpg").getImage());
 		cPane = getContentPane();
 		cPane.setLayout(new BoxLayout(cPane, BoxLayout.X_AXIS));
 		setUpGridDisplay();
