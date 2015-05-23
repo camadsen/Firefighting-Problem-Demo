@@ -4,8 +4,8 @@ import java.util.Random;
 
 
 public class FirefighterModel {
-	private static boolean burnTurn=false; //whether or not it is the turn of the fire
-	private static boolean reachedD7=false; //whether or not the fire has reached D7 (a distance of 7 from the origin)
+	private static boolean burnTurn; //whether or not it is the turn of the fire
+	private static boolean reachedD7; //whether or not the fire has reached D7 (a distance of 7 from the origin)
 	private static int time; //the current time step of the simulation
 	private static int maxThtVal; //the maximum threat value of any D5 vertex
 	private static Vertex[][] grid= new Vertex[19][19]; //the array of all vertices on the grid that are displayed in the simulation
@@ -22,6 +22,8 @@ public class FirefighterModel {
 	FirefighterModel(){
 		time=0;
 		maxThtVal=-1;
+		burnTurn=false;
+		reachedD7=false;
 		setUpGrid();
 	}
 	
@@ -69,8 +71,16 @@ public class FirefighterModel {
 	 * An accessor for burnTurn
 	 * @return true if it is the fire's turn and false if it is the firefighter's turn
 	 */
-	public boolean isBurnTurn(){
+	public static boolean isBurnTurn(){
 		return burnTurn;
+	}
+	
+	/**
+	 * A mutator for burnTurn
+	 * @return true if it is the fire's turn and false if it is the firefighter's turn
+	 */
+	public static void switchBurnTurn(boolean turn){
+		burnTurn=turn;
 	}
 	
 	/**
@@ -79,6 +89,14 @@ public class FirefighterModel {
 	public static void reachedD7(){
 		reachedD7=true;
 	}
+	
+	/**
+	 * A method to check whether or not D7 has been reached
+	 */
+	public static boolean hasReachedD7(){
+		return reachedD7;
+	}
+
 
 	/**
 	 * A method to set up the grid of Vertices for the simulation
@@ -110,7 +128,7 @@ public class FirefighterModel {
 	public static boolean burnFrom(Vertex v){
 		if(burnableVertices.contains(v.getCoordinate())){
 			if(v.canBeBurnedFrom()){
-				FirefighterModel.justBurned.clear();
+				justBurned.clear();
 				v.burnFrom();
 				return true;
 			}
@@ -189,9 +207,6 @@ public class FirefighterModel {
 				maxAlgorithmChoices.add(v);
 			}
 		}
-		for(Vertex v:maxAlgorithmChoices){
-			System.out.print(v.getCoordinate());
-		}
 		//maxAlgorithmChoices now holds all D7 vertices that will affect a maximum number of 
 		//D5 vertices that currently have the maximum threat value
 		if(maxAlgorithmChoices.size()>1){
@@ -207,10 +222,6 @@ public class FirefighterModel {
 					allAlgorithmChoices.add(d);
 				}
 			}
-			System.out.println();
-			for(Vertex v:allAlgorithmChoices){
-				System.out.print(v.getCoordinate());
-			}
 			if(allAlgorithmChoices.size()>1){
 				int maxRecent=0;
 				ArrayList<D7> recentAlgorithmChoices=new ArrayList<D7>();
@@ -222,10 +233,6 @@ public class FirefighterModel {
 						}
 						recentAlgorithmChoices.add(d);
 					}
-				}
-				System.out.println();
-				for(Vertex v:recentAlgorithmChoices){
-					System.out.print(v.getCoordinate());
 				}
 				return recentAlgorithmChoices.get(0);
 			}
@@ -253,32 +260,37 @@ public class FirefighterModel {
 
 	/**
 	 * A method to choose randomly which D7 vertex should next be protected
+	 * 
+	 * @return true if all D7 vertices have been protected and the fire is contained and false otherwise
 	 */
-	public static void randomD7Protect(){
+	public static boolean randomD7Protect(){
 		Vertex v = d7Unprotected.get(gen.nextInt(d7Unprotected.size()));
 		if(!protect(v)){
 			randomD7Protect();
 			if(d7Unprotected.size()==0){
-				
+				return true;
 			}
+			return false;
 		}
 		else{
 			burnTurn=true;
+			return false;
 		}
 	}
 
 	/**
 	 * A method that uses protects the choice chosen by the algorithm and tests if the fire has been contained
+	 * 
+	 * @return true if all D7 vertices have been protected and the fire is contained and false otherwise
 	 */
-	public static void algorithmicD7Protect(){
+	public static boolean algorithmicD7Protect(){
 		Vertex v=algorithmicD7Choice();
 		protect(v);
 		if(d7Unprotected.size()==0){
-			JOptionPane.showMessageDialog(null,  "All D7 vertices have been protected and the fire has been contained. The board will now reset.", 
-					"Fire Contained", JOptionPane.INFORMATION_MESSAGE);
-			reset();
+			return true;
 		}
 		burnTurn=true;
+		return false;
 	}
 
 }

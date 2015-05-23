@@ -73,7 +73,7 @@ public class Vertex {
 			v.timeBurned=FirefighterModel.getTime();
 			FirefighterModel.getBurnableVertices().add(v.getCoordinate());
 			FirefighterModel.getJustBurned().add(v.getCoordinate());
-			burnOrigin=c;
+			v.burnOrigin=c;
 			updateFireDistance();
 			if(Math.abs(v.c.getX())+Math.abs(v.c.getY())==7){
 				FirefighterModel.reachedD7();

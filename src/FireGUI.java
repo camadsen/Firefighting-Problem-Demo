@@ -35,7 +35,11 @@ public class FireGUI extends JFrame {
 	private static JRadioButton firef1 = new JRadioButton("User Choice", true);
 	private static JRadioButton firef2 = new JRadioButton("Random D7 Protection", false);
 	private static JRadioButton firef3 = new JRadioButton("Algorithmic D7 Protection", false);
+	public static boolean goPastD7=false;
 
+	/**
+	 * This constructor creates the GUI for the Firefighting problem simulation.
+	 */
 	public FireGUI(){
 		super("Firefighting Demonstration");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -73,6 +77,9 @@ public class FireGUI extends JFrame {
 		});
 	}
 
+	/**
+	 * This class sets up the right side of the GUI with the Image, time label, and turn label.
+	 */
 	public void setUpGridDisplay(){
 		gridDisplay.setLayout(new BoxLayout(gridDisplay, BoxLayout.Y_AXIS));
 		gridDisplay.setPreferredSize(new Dimension(side,side+30));
@@ -86,8 +93,11 @@ public class FireGUI extends JFrame {
 		gridDisplay.add(graph);
 		gridDisplay.add(label);
 	}
-	
 
+
+	/**
+	 * This class sets up the radio buttons for the fire and firefighter options and reset button on the GUI.
+	 */
 	public static void setUpOptionBar(){
 		optionBar.setLayout(new BoxLayout(optionBar, BoxLayout.Y_AXIS));
 		optionBar.setPreferredSize(new Dimension(190, side+30));
@@ -134,9 +144,12 @@ public class FireGUI extends JFrame {
 	}
 
 
+	/**
+	 * This class changes all text labels to convey correctly the time and turn.
+	 */
 	public static void setCounters(){
 		String s="'s Turn";
-		if(FirefighterModel.burnTurn){
+		if(FirefighterModel.isBurnTurn()){
 			s="Fire".concat(s);
 			turnCounter.setForeground(Color.RED);
 		}
@@ -149,6 +162,10 @@ public class FireGUI extends JFrame {
 		timeCounter.setText("Time: "+FirefighterModel.getTime());
 	}
 
+	/**
+	 * This class defines buttonlisteners for the radio buttons that can change the type of fire and firefighter.
+	 *
+	 */
 	static class ButtonListener implements ActionListener{
 		public int buttonType; //0=fire, 1=firefighter
 		public int option;
@@ -161,19 +178,37 @@ public class FireGUI extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			if(buttonType==0){
 				fireMode=option;
-				if(option==1 && Firefighter.burnTurn){
+				if(option==1 && FirefighterModel.isBurnTurn()){
 					FirefighterModel.randomBurn();
+					if(FirefighterModel.hasReachedD7()){
+						graph.repaint();
+						int choice=JOptionPane.showConfirmDialog(null,  "The fire has reached D7. Do you wish to reset the board?", 
+								"Fire Reached D7", JOptionPane.YES_NO_OPTION);
+						if(choice==0){
+							reset();
+						}
+					}
 					graph.repaint();
 				}
 			}
 			else{
 				firefighterMode=option;
-				if(option==1 && !FirefighterModel.burnTurn){
-					FirefighterModel.randomD7Protect();
+				if(option==1 && !FirefighterModel.isBurnTurn()){
+					if(FirefighterModel.randomD7Protect()){
+						graph.repaint();
+						JOptionPane.showMessageDialog(null,  "All D7 vertices have been protected and the fire has been contained. The board will now reset.", 
+								"Fire Contained", JOptionPane.INFORMATION_MESSAGE);
+						reset();
+					}
 					graph.repaint();
 				}
-				if(option==2 && !FirefighterModel.burnTurn){
-					FirefighterModel.algorithmicD7Protect();
+				if(option==2 && !FirefighterModel.isBurnTurn()){
+					if(FirefighterModel.algorithmicD7Protect()){
+						graph.repaint();
+						JOptionPane.showMessageDialog(null,  "All D7 vertices have been protected and the fire has been contained. The board will now reset.", 
+								"Fire Contained", JOptionPane.INFORMATION_MESSAGE);
+						reset();
+					}
 					graph.repaint();
 				}
 			}
@@ -186,17 +221,27 @@ public class FireGUI extends JFrame {
 
 	}
 
+	/**
+	 * This method resets the simulation back to Time 0.
+	 */
 	public static void reset(){
 		fire1.setSelected(true);
 		fireMode=0;
 		firefighterMode=0;
+		goPastD7=false;
 		firef1.setSelected(true);
 		new FirefighterModel();
-		FirefighterModel.burnTurn=false;
+		FirefighterModel.switchBurnTurn(false);
 		setCounters();
 		graph.repaint();
 	}
 
+	/**
+	 * This method processes a single click on the simulation by figuring which vertex is closest to the click
+	 * then using that vertex to either protect or burn from depending on whether it is the fire or firefighter's turn.
+	 * @param x - the x location of the click
+	 * @param y - the y location of the click
+	 */
 	public static void click(int x, int y){
 		//determine the node
 		int xRound = (int)Math.round((x-side*0.5)/gap);
@@ -206,16 +251,37 @@ public class FireGUI extends JFrame {
 		}
 		Coordinate c = new Coordinate(xRound,yRound);
 		Vertex v = Vertex.getVertex(c);
-		if(Firefighter.burnTurn){
+		if(FirefighterModel.isBurnTurn()){
 			//burn from
 			if(FirefighterModel.burnFrom(v)){
-				FirefighterModel.burnTurn=false;
+				FirefighterModel.switchBurnTurn(false);
 				label.setText(" ");
+				if(FirefighterModel.hasReachedD7()&&!goPastD7){
+					graph.repaint();
+					int choice=JOptionPane.showConfirmDialog(null,  "The fire has reached D7. Do you wish to reset the board?", 
+							"Fire Reached D7", JOptionPane.YES_NO_OPTION);
+					if(choice==0){
+						reset();
+					}
+					else{
+						goPastD7=true;
+					}
+				}
 				if(firefighterMode==1){
-					FirefighterModel.randomD7Protect();
+					if(FirefighterModel.randomD7Protect()){
+						graph.repaint();
+						JOptionPane.showMessageDialog(null,  "All D7 vertices have been protected and the fire has been contained. The board will now reset.", 
+								"Fire Contained", JOptionPane.INFORMATION_MESSAGE);
+						reset();
+					}
 				}
 				if(firefighterMode==2){
-					FirefighterModel.algorithmicD7Protect();
+					if(FirefighterModel.algorithmicD7Protect()){
+						graph.repaint();
+						JOptionPane.showMessageDialog(null,  "All D7 vertices have been protected and the fire has been contained. The board will now reset.", 
+								"Fire Contained", JOptionPane.INFORMATION_MESSAGE);
+						reset();
+					}
 				}
 			}
 			else{
@@ -225,10 +291,18 @@ public class FireGUI extends JFrame {
 		else{
 			//protect at
 			if(FirefighterModel.protect(v)){
-				FirefighterModel.burnTurn=true;
+				FirefighterModel.switchBurnTurn(true);
 				label.setText(" ");
 				if(fireMode==1){
 					FirefighterModel.randomBurn();
+					if(FirefighterModel.hasReachedD7()){
+						graph.repaint();
+						int choice=JOptionPane.showConfirmDialog(null,  "The fire has reached D7. Do you wish to reset the board?", 
+								"Fire Reached D7", JOptionPane.YES_NO_OPTION);
+						if(choice==0){
+							reset();
+						}
+					}
 				}
 			}
 			else{
@@ -240,7 +314,11 @@ public class FireGUI extends JFrame {
 	}
 
 
-	
+	/**
+	 * This class is that of the Image of the simulation. It listens for mouse clicks to determine
+	 * where to burn from or protect and draws the current state of the simulation.
+	 *
+	 */
 	public class Image extends JPanel {
 		private static final long serialVersionUID = 1L;
 		public Image() {
@@ -260,10 +338,19 @@ public class FireGUI extends JFrame {
 				}
 			});
 		}
+
+		/**
+		 * Return the preferred size of the simulation Image
+		 */
 		public Dimension getPreferredSize() {
 			Dimension d = new Dimension(side, side);
 			return d;
 		}
+
+		/**
+		 * This method draws the simulation Image by drawing the grid and points then marking
+		 * burnt and protected vertices.
+		 */
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
 			Graphics2D g2 = (Graphics2D) g;
@@ -317,6 +404,9 @@ public class FireGUI extends JFrame {
 	}
 
 
+	/**
+	 * Main method for the Firefighting Problem simulation that runs the GUI
+	 */
 	public static void main(String[] args) {
 		new FireGUI();
 		while(true){
