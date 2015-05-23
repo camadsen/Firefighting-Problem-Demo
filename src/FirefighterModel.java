@@ -1,3 +1,11 @@
+/**
+ * A class that contains all information necessary for the Firefighting problem simulation/game.
+ * 
+ * @author Corinne Madsen
+ * @date 5/23/15
+ *
+ */
+
 import java.util.ArrayList;
 import java.util.Random;
 

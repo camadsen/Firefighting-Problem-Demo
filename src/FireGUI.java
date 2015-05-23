@@ -1,15 +1,14 @@
-/*
- * Corinne Madsen
- * June 17, 2014
- * fireGUI for a game version of the Firefighting Problem
+/**
+ * A class that constructs a GUI for the Firefighting problem simulation/game.
+ * 
+ * @author Corinne Madsen
+ * @date 5/23/15
+ *
  */
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Random;
-
 import javax.swing.*;
-//import javax.swing.Box.Filler;
 
 public class FireGUI extends JFrame {
 	private static final long serialVersionUID = 1L;
