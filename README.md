@@ -1,5 +1,5 @@
 # Firefighting-Problem-Demo
-An interective demo of my proof for containing the 1-pyro, an extension of the firefighting problem
+Summary: An interective demo of my proof for containing the 1-pyro, an extension of the firefighting problem.
 
 In the Firefighter Problem, a fire begins on a single vertex on a graph and expands to every unprotected adjacent vertex
 on each of it's turns. After each of the fire's turns, a firefighter can protect some set number, n, of vertices. In this
