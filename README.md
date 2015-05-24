@@ -8,7 +8,7 @@ the time it takes to do so or the number of burnt vertices or both or contain it
 
 Two summers ago, I worked with Dr. Margaret-Ellen Messinger on an extension of this problem: the 1-pyro Firefighting 
 problem. In our research, we used the cartesian plane as our graph and n as 1. The difference between this extension 
-and the original problem is that the fire is what we denoted a 1-pryo. Rather than being able to burn from every possible
+and the original problem is that the fire is what we denoted a 1-pyro. Rather than being able to burn from every possible
 vertex that is burning on each turn, the fire can only choose one. Our research was to determine whether or not such a 
 fire could be contained by a firefighter only able to protect one vertex each turn.
 
